@@ -623,7 +623,8 @@ public class Store
                                         final Depth depth,
                                         final boolean isPrivate,
                                         final UserAccount owner,
-                                        final Map<Depth, String> depthLabels )
+                                        final Map<Depth, String> depthLabels,
+                                        final boolean confirmContextChange )
           throws ConfigException
     {
         Repository repository = new Repository( name, depth, isPrivate, owner.getAccount() );
@@ -631,11 +632,11 @@ public class Store
         repository.setDepthLabels( depthLabels );
         repository.setSecurityProfilesEnabled( true );
         repository.setValueTypeEnabled( true );
+        repository.setConfirmContextChange( confirmContextChange );
 
         saveOrUpdateAudited( owner, repository, repository );
         return repository;
     }
-
 
     /**
      * Repository creation that belongs to the organization
@@ -656,8 +657,9 @@ public class Store
                                         final boolean isPrivate,
                                         final Organization organization,
                                         final Map<Depth, String> depthLabels,
-                                        final UserAccount author )
-          throws ConfigException
+                                        final UserAccount author,
+                                        final boolean confirmContextChange )
+            throws ConfigException
     {
         // ToDo:: SECURITY RISK
         // Someone could add a user to the admins or owners, and then make change to the repository.
@@ -666,8 +668,7 @@ public class Store
         //
         // We have to get the repository from the database and validate ownershit/admin-ship through that
         // object.  Not through modified one.
-        if ( !organization.isOwner( author ) && !organization.isAdmin( author ) )
-        {
+        if ( !organization.isOwner( author ) && !organization.isAdmin( author ) ) {
             throw new ConfigException( Error.Code.USER_ACCESS_DENIED );
         }
 
@@ -676,12 +677,12 @@ public class Store
         repository.setDepthLabels( depthLabels );
         repository.setSecurityProfilesEnabled( true );
         repository.setValueTypeEnabled( true );
+        repository.setConfirmContextChange( confirmContextChange );
 
         saveOrUpdateAudited( author, repository, repository );
 
         return repository;
     }
-
 
     /**
      * @param repository to delete
